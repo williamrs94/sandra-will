@@ -604,6 +604,16 @@ img,table,pre{max-width:100%}
 @media(max-width:640px){
  .wrap{padding:0 14px 62px}
 
+ /* ORDEM DA HOME NO CELULAR: o calendario so entrega o nome da viagem no
+    hover, e toque nao tem hover. Entao ele desce, e o que serve sobe. */
+ #hub .wrap{display:flex;flex-direction:column}
+ #hub .wrap > *{order:5}
+ #hub .hero{order:1}
+ #hub #cdwrap{order:2}
+ #hub #hNext{order:3}
+ #hub #nextTrips{order:4}
+ #hub #nextEmpty{order:4}
+
  /* BARRA DE TOPO: quebrava em duas linhas no celular. Nada de wrap,
     e o que e enfeite sai de cena. */
  nav .in{gap:8px;padding:11px 14px;flex-wrap:nowrap}
