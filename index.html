@@ -1,4 +1,4 @@
-<!doctype html><html lang='pt-BR' data-theme='hub' data-skin='cartoon'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='robots' content='noindex,nofollow,noarchive'><title>Nossas Viagens &middot; Will &amp; Sandra</title><script>(function(){try{var d=document.documentElement,p=localStorage.getItem('pele2'),i=localStorage.getItem('idioma');if(p)d.setAttribute('data-skin',p);if(i)d.setAttribute('lang',i);}catch(e){}})()</script><style>
+<!doctype html><html lang='pt-BR' data-theme='hub' data-skin='cartoon'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='robots' content='noindex,nofollow,noarchive'><title>Nossas Viagens &middot; Will &amp; Sandra</title><script>window.SITE_V='20260819-2310';(function(){try{var d=document.documentElement,p=localStorage.getItem('pele2'),i=localStorage.getItem('idioma');if(p)d.setAttribute('data-skin',p);if(i)d.setAttribute('lang',i);}catch(e){}})()</script><style>
 :root{
  --bg:#0e1a1d;--card:#16262a;--card2:#1b3034;--line:rgba(255,255,255,.075);
  --ink:#e9efee;--ink2:#9fb4b6;--ink3:#6f8285;
@@ -1595,7 +1595,8 @@ function fbCampos(txt,n){var el=FB.alvo||document.body;
    +' / tela '+window.innerWidth+'x'+window.innerHeight],
   ['Numero',String(n)],
   ['Data',new Date().toString()],
-  ['Anexos',String(FB.arqs.length)]];}
+  ['Anexos',String(FB.arqs.length)],
+  ['Versao do site',window.SITE_V||'?']];}
 function fbEnvia(){var txt=document.getElementById('fbTxt').value.trim();
  var st=document.getElementById('fbStatus'),bt=document.getElementById('fbEnv');
  if(!txt&&!FB.arqs.length){st.innerHTML=dois('escreva algo ou anexe um print',
