@@ -322,6 +322,9 @@ nav .sw{margin-left:auto;display:flex;gap:7px;align-items:center;flex-shrink:0}
  border:1px solid var(--line);color:var(--ink2);transition:all .18s;white-space:nowrap}
 .swb:hover{color:var(--ink);background:rgba(255,255,255,.13)}
 .swb .ic{font-size:12.5px;vertical-align:-1px}
+/* o rotulo do botao e um span bilingue: sem isto o clique cai no span, mostra
+   cursor de texto e o micro-arrasto da selecao cancela o clique */
+.swb *,.ytab *{pointer-events:none;user-select:none;-webkit-user-select:none}
 @media(max-width:560px){nav .brand{font-size:14px}.swb{padding:5px 10px;font-size:10.5px}
  nav .in{gap:9px}nav .dot{display:none}}
 
@@ -1566,35 +1569,72 @@ function fbThumbs(){var d=document.getElementById('fbThumbs');d.innerHTML='';
   t.innerHTML='<img src="'+u+'"><span class="x">&times;</span>';
   t.querySelector('.x').onclick=function(){FB.arqs.splice(i,1);fbThumbs();};
   d.appendChild(t);});}
+function fbSecao(el){var e=el;
+ while(e&&e!==document.body){
+  var p=e.previousElementSibling;
+  while(p){ if(p.matches&&p.matches('h2,h3,.mes,.boxt,.day,.mapa-t')){
+    var t=(p.innerText||'').trim().replace(/\s+/g,' ').slice(0,70); if(t)return t;}
+   p=p.previousElementSibling;}
+  e=e.parentElement;}
+ var h=document.querySelector('.page.on .hero h1');
+ return h?(h.innerText||'').trim():'';}
+function fbCampos(txt,n){var el=FB.alvo||document.body;
+ var r=el.getBoundingClientRect();
+ var topo=Math.round(r.top+window.pageYOffset);
+ var pct=Math.round(topo/Math.max(1,document.documentElement.scrollHeight)*100);
+ return [
+  ['_subject','Feedback #'+n+' - Nossas Viagens'],
+  ['_captcha','false'],['_template','box'],
+  ['Mensagem',txt||'(so anexo)'],
+  ['Onde - pagina',((document.querySelector('.page.on')||{}).id||'?')+'  '+location.href],
+  ['Onde - secao',fbSecao(el)],
+  ['Onde - elemento clicado',fbRotulo(el)],
+  ['Onde - posicao','~'+topo+'px do topo, '+pct+'% da pagina'],
+  ['Tecnico - caminho CSS',fbCaminho(el)],
+  ['Tecnico - contexto',(EN()?'en':'pt')+' / '+(document.documentElement.getAttribute('data-skin')||'?')
+   +' / tela '+window.innerWidth+'x'+window.innerHeight],
+  ['Numero',String(n)],
+  ['Data',new Date().toString()],
+  ['Anexos',String(FB.arqs.length)]];}
 function fbEnvia(){var txt=document.getElementById('fbTxt').value.trim();
  var st=document.getElementById('fbStatus'),bt=document.getElementById('fbEnv');
  if(!txt&&!FB.arqs.length){st.innerHTML=dois('escreva algo ou anexe um print',
   'write something or attach a screenshot');return;}
  bt.disabled=true;st.innerHTML=dois('enviando...','sending...');
- var n=fbSeq()+1, fd=new FormData();
- fd.append('_subject','Feedback #'+n+' - Nossas Viagens');
- fd.append('_captcha','false');fd.append('_template','box');
- fd.append('Numero',String(n));
- fd.append('Data',new Date().toString());
- fd.append('Pagina',((document.querySelector('.page.on')||{}).id||'?')+'  '+location.href);
- fd.append('Contexto',(EN()?'en':'pt')+' / '+(document.documentElement.getAttribute('data-skin')||'?')
-  +' / '+window.innerWidth+'x'+window.innerHeight);
- fd.append('Elemento',fbCaminho(FB.alvo||document.body));
- fd.append('Trecho',fbRotulo(FB.alvo||document.body));
- fd.append('Mensagem',txt||'(so anexo)');
- FB.arqs.forEach(function(f,i){fd.append('anexo'+(i+1),f,f.name||('print'+(i+1)+'.jpg'));});
- fetch('https://formsubmit.co/ajax/willrafael.seewald@gmail.com',
-   {method:'POST',headers:{'Accept':'application/json'},body:fd})
- .then(function(r){return r.json();}).then(function(j){
-  if(j&&(j.success===true||j.success==='true')){
-   try{localStorage.setItem('fb_seq',String(n));}catch(x){}
-   st.innerHTML=dois('enviado, obrigado! feedback #'+n,'sent, thank you! feedback #'+n);
-   bt.disabled=false;
-   FB.tm=setTimeout(fbSai,1900);}
-  else{bt.disabled=false;
-   st.innerHTML=dois('n&atilde;o foi: ','failed: ')+((j&&j.message)?j.message:'?');}})
- .catch(function(){bt.disabled=false;
-  st.innerHTML=dois('sem conex&atilde;o, tenta de novo','no connection, try again');});}
+ var n=fbSeq()+1, campos=fbCampos(txt,n);
+ function ok(){try{localStorage.setItem('fb_seq',String(n));}catch(x){}
+  bt.disabled=false;
+  st.innerHTML=dois('enviado, obrigado! feedback #'+n,'sent, thank you! feedback #'+n);
+  FB.tm=setTimeout(fbSai,1900);}
+ function falha(m){bt.disabled=false;
+  st.innerHTML=dois('n&atilde;o foi: ','failed: ')+(m||'?');}
+ if(!FB.arqs.length){
+  /* sem anexo: ajax, que devolve resposta de verdade */
+  var fd=new FormData();campos.forEach(function(c){fd.append(c[0],c[1]);});
+  fetch('https://formsubmit.co/ajax/willrafael.seewald@gmail.com',
+    {method:'POST',headers:{'Accept':'application/json'},body:fd})
+  .then(function(r){return r.json();}).then(function(j){
+    if(j&&(j.success===true||j.success==='true'))ok(); else falha(j&&j.message);})
+  .catch(function(){falha(EN()?'no connection, try again':'sem conexão, tenta de novo');});
+  return;}
+ /* com anexo: POST classico num iframe invisivel, porque o /ajax/ descarta arquivo */
+ var ifr=document.getElementById('fbFrame');
+ if(!ifr){ifr=document.createElement('iframe');ifr.id='fbFrame';ifr.name='fbFrame';
+  ifr.style.display='none';document.body.appendChild(ifr);}
+ var fo=document.createElement('form');
+ fo.action='https://formsubmit.co/willrafael.seewald@gmail.com';
+ fo.method='POST';fo.enctype='multipart/form-data';fo.target='fbFrame';fo.style.display='none';
+ campos.forEach(function(c){var i=document.createElement('input');
+  i.type='hidden';i.name=c[0];i.value=c[1];fo.appendChild(i);});
+ FB.arqs.forEach(function(f,i){var inp=document.createElement('input');
+  inp.type='file';inp.name='anexo'+(i+1);
+  try{var dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;}catch(x){}
+  fo.appendChild(inp);});
+ document.body.appendChild(fo);
+ var deu=false,tmax=setTimeout(function(){ if(!deu){deu=true;fo.remove();
+  falha(EN()?'took too long, try again':'demorou demais, tenta de novo');}},20000);
+ ifr.onload=function(){ if(deu)return;deu=true;clearTimeout(tmax);fo.remove();ok();};
+ fo.submit();}
 document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&FB.on)fbSai(); });
 
 window.addEventListener('scroll',onScroll,{passive:true});
