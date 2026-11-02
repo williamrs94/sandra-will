@@ -1,4 +1,4 @@
-<!doctype html><html lang='pt-BR' data-theme='hub' data-skin='cartoon'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='robots' content='noindex,nofollow,noarchive'><title>Nossas Viagens &middot; Will &amp; Sandra</title><script>window.SITE_V='20261102-1150';(function(){try{var d=document.documentElement,p=localStorage.getItem('pele2'),i=localStorage.getItem('idioma');if(p)d.setAttribute('data-skin',p);if(i)d.setAttribute('lang',i);}catch(e){}})()</script><style>
+<!doctype html><html lang='pt-BR' data-theme='hub' data-skin='cartoon'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name='robots' content='noindex,nofollow,noarchive'><title>Nossas Viagens &middot; Will &amp; Sandra</title><script>window.SITE_V='20261102-1243';(function(){try{var d=document.documentElement,p=localStorage.getItem('pele2'),i=localStorage.getItem('idioma');if(p)d.setAttribute('data-skin',p);if(i)d.setAttribute('lang',i);}catch(e){}})()</script><style>
 :root{
  --bg:#15100D;--card:#221A15;--card2:#2B211B;--line:rgba(255,255,255,.075);
  --ink:#F4E9DD;--ink2:#CDB7A3;--ink3:#A89180;
@@ -270,10 +270,10 @@ ol,ul{padding-left:21px}li{margin-bottom:10px;font-size:14.5px}
 .gal figure:hover{transform:translateY(-3px);box-shadow:var(--sh-m)}
 .gal img{display:block;width:100%;height:auto;aspect-ratio:9/16;object-fit:cover;transition:transform .4s}
 .gal figure:hover img{transform:scale(1.04)}
-#lb{position:fixed;inset:0;z-index:80;background:rgba(12,8,6,.94);display:none;align-items:center;justify-content:center;cursor:zoom-out;padding:26px}
+#lb{position:fixed;inset:0;z-index:80;background:rgba(12,8,6,.94);display:none;align-items:center;justify-content:center;cursor:pointer;padding:72px 26px 26px;padding-top:calc(72px + env(safe-area-inset-top))}
 #lb.on{display:flex;animation:pgIn .25s both}
 #lb img{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.8)}
-#lb .fechar{position:absolute;top:18px;right:24px;color:var(--ink2);font-size:30px;line-height:1;font-weight:300}
+#lb .fechar{position:absolute;z-index:2;top:calc(12px + env(safe-area-inset-top));right:14px;width:48px;height:48px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:30px;line-height:48px;font-weight:300;padding:0;cursor:pointer}
 /* ---------- feedback em qualquer elemento ---------- */
 body.fb-on, body.fb-on *{cursor:crosshair!important}
 body.fb-on #fbPanel,body.fb-on #fbPanel *,body.fb-on #fbBar{cursor:auto!important}
@@ -653,7 +653,7 @@ html[data-skin="cartoon"] .tip{background:#fff;border:var(--out);box-shadow:var(
 html[data-skin="cartoon"] .tip .k{color:#8A5A14}
 html[data-skin="cartoon"] #lb{background:rgba(247,239,228,.93);backdrop-filter:none;-webkit-backdrop-filter:none}
 html[data-skin="cartoon"] #lb img{border:var(--out);box-shadow:var(--sh-l)}
-html[data-skin="cartoon"] #lb .fechar{color:var(--ink)}
+html[data-skin="cartoon"] #lb .fechar{color:var(--ink);background:var(--card);border:var(--out);box-shadow:var(--sh-l);line-height:44px}
 html[data-skin="cartoon"] .foot{color:var(--ink3)}
 html[data-skin="cartoon"] #fbBar,html[data-skin="cartoon"] #fbPanel{background:#fff;border:var(--out)}
 html[data-skin="cartoon"] #fbPanel textarea{background:#FFF6EA;color:var(--ink);border:2px solid var(--ink)}
@@ -833,7 +833,7 @@ img,table,pre{max-width:100%}
  /* GALERIA E LIGHTBOX */
  .gal{gap:10px}
  .gal figure{border-radius:18px}
- #lb{padding:12px}
+ #lb{padding:68px 12px 12px;padding-top:calc(68px + env(safe-area-inset-top))}
  .tip{max-width:min(78vw,260px)}
 }
 
@@ -1091,7 +1091,8 @@ function oporRoll(){
 function lb(fig){
  var d=document.getElementById('lb');
  if(!d){d=document.createElement('div');d.id='lb';
-  d.innerHTML='<span class="fechar">&times;</span><img alt="">';
+  d.innerHTML='<button class="fechar" type="button" aria-label="fechar">&times;</button><img alt="">';
+  d.setAttribute('onclick','');
   d.addEventListener('click',function(){d.className='';});
   document.body.appendChild(d);}
  d.querySelector('img').src=fig.querySelector('img').src;
